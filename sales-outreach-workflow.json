@@ -1,0 +1,169 @@
+{
+  "name": "AI Sales Outreach Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sales-outreach",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Get prospect data from webhook\nconst prospectData = $input.item.json;\n\n// Validate required fields\nconst requiredFields = ['name', 'company', 'role', 'industry', 'platform'];\nconst missingFields = requiredFields.filter(field => !prospectData[field]);\n\nif (missingFields.length > 0) {\n  return {\n    error: `Missing required fields: ${missingFields.join(', ')}`\n  };\n}\n\nreturn {\n  prospectData,\n  timestamp: new Date().toISOString()\n};"
+      },
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "apiKey",
+        "apiKey": "={{$env.OPENAI_API_KEY}}",
+        "model": "gpt-3.5-turbo",
+        "prompt": "=Create a personalized {{$json.prospectData.platform}} outreach message for the following prospect:\nName: {{$json.prospectData.name}}\nCompany: {{$json.prospectData.company}}\nRole: {{$json.prospectData.role}}\nIndustry: {{$json.prospectData.industry}}\n\nThe message should be:\n- Professional and engaging\n- Reference their company/role\n- Include a clear value proposition\n- End with a specific call to action\n- Keep it concise (max 3-4 sentences)",
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "name": "Generate Message",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "sales-outreach-history",
+        "data": "={\n  timestamp: $json.timestamp,\n  prospect: $json.prospectData,\n  message: $json.text,\n  status: 'Draft'\n}"
+      },
+      "name": "Store in Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.error}}",
+              "operation": "exists"
+            }
+          ]
+        }
+      },
+      "name": "Error Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        450,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "={\n  success: false,\n  error: $json.error\n}"
+      },
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        650,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "={\n  success: true,\n  data: {\n    timestamp: $json.timestamp,\n    prospect: $json.prospectData,\n    message: $json.text,\n    status: 'Draft'\n  }\n}"
+      },
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        850,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Error Check",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Message": {
+      "main": [
+        [
+          {
+            "node": "Store in Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Airtable": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Check": {
+      "main": [
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  }
+} 
