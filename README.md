@@ -82,4 +82,4 @@ Your input file should be a CSV or Excel file with the following columns:
 
 ## Support
 
-For issues and feature requests, please open an issue in the repository. 
+For issues and feature requests, please open an issue in the repository.
