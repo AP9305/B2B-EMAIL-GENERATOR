@@ -45,7 +45,7 @@ df = pd.DataFrame(data)
 
 # Save to Excel with explicit engine
 try:
-    df.to_excel('sample_data.xlsx', index=False, engine='openpyxl')
+    df.to_excel('sample.xlsx', index=False, engine='openpyxl')
     print("Sample Excel file created successfully!")
 except Exception as e:
     print(f"Error creating Excel file: {str(e)}")
@@ -66,7 +66,7 @@ except Exception as e:
                 ws.cell(row=row_idx, column=col_idx, value=value)
         
         # Save the workbook
-        wb.save('sample_data.xlsx')
+        wb.save('sample.xlsx')
         print("Sample Excel file created successfully using alternative method!")
     except Exception as e:
-        print(f"Error creating Excel file using alternative method: {str(e)}") 
+        print(f"Error creating Excel file using alternative method: {str(e)}")
