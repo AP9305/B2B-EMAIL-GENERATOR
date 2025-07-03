@@ -1,3 +1,5 @@
+No change is needed in the requirements.txt file as the requested change is related to renaming the README.md file, not the requirements.txt file. Therefore, the original content of the requirements.txt file remains the same:
+
 streamlit==1.32.0
 openai==1.12.0
 pandas==2.2.0

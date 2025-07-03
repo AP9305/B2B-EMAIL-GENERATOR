@@ -1,3 +1,6 @@
+File path: DEMO.md
+
+New file content:
 # B2B Cold Email Automation System
 
 This system automates the process of generating and sending personalized cold emails to B2B prospects. It uses AI to analyze company information and create compelling emails, with follow-up capabilities.
