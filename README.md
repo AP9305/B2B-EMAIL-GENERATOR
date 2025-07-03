@@ -83,5 +83,3 @@ Your input file should be a CSV or Excel file with the following columns:
 ## Support
 
 For issues and feature requests, please open an issue in the repository.
-
-Please provide the full new file content after making the requested change. If no change is needed, return the original content.

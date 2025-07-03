@@ -1,4 +1,4 @@
-File path: mytabs.py
+File path: ailifebot.py
 
 New file content:
 import pandas as pd
